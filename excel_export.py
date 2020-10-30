@@ -2,9 +2,11 @@ import numpy as np
 import pandas as pd
 
 df = pd.DataFrame({
-    'Col A': [1,2,3],
-    'Col B': ['bokita','elmas','grande'],
-    'Col C': [np.nan,np.nan,'not empty']
+    'Material': ["Madera"],
+    'L1 [m]': [2],
+    'L2 [m]': [2],
+    'Espesor [m]': 0.1,
+    'fc': 180
     })
 
 df.to_excel('example.xlsx', index=False)
