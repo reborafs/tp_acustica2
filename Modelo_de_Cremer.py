@@ -85,6 +85,7 @@ def modelo_de_cremer(E, t, tau, c0, lx, ly, densidad, ninterno, f):
     ms = densidad * t
     B = (E*(t**3))/(12*(1-(tau**2)))
     fc = ((c0**2)/(2*np.pi))*(np.sqrt(ms/B))
+    print(fc)
     fd = (E/(2*np.pi*densidad)) * (np.sqrt(ms/B))
     f11 = ((c0**2)/4*fc)*((1/(lx**2))+(1/(ly**2)))
 

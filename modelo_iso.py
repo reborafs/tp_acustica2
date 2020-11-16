@@ -2,93 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-
-
-# f = 200                     #Frecuencia
-
-# ko= 2*np.pi*f/co            #Numero de onda
-
-# l1 = 1                      #Longitud del material
-# l2 = 2                      #Altura del material
-
-# f11 = (co**2/4*fc)*(l1**-2 + l2**-2) #frecuencia de comparación para SIGMA
-
-# f_lambda = np.sqrt(f/fc)     #Lambda para calcular la densidad d1 y d2
-
-
-# def sigma_f(ko, l1, l2):
-     
-    # pico = -0.9564- (0.5+ (l2/(l1*np.pi)))*np.ln(l2/l1) + (5*l2/ 2*np.pi*l1)- (1/ 4*np.p1*l1*l2*(ko**2))
-    # sigma_f = 0.5* (np.ln(ko*np.sqrt(l1*l2))- pico)
-    
-#     return sigma_f
-
-
-# d1 = 1                      #
-# d2 = 2                      #
-
-# cálculo del factor de radiación para ondas libres 
-# sigma1= (1-(fc/f))**(-1/2)
-# sigma2 = 4*l1*l2*((f/co)**2)  
-# sigma3 = (2*np.pi*f*(l1+l2))/((16*co)**(1/2))
-# sigma4 = ((2*(l1+l2)*co*d1)/(l1*l2*fc))+d2
-
-# if f11<=(fc/2):
-#     if fc<=f: 
-#         sigma = sigma1
-    
-#     else:
-#         vlambda = f_lambda
-#         d1= ((1-vlambda**2)*np.ln((1+vlambda)/(1-vlambda))+
-#              2*vlambda)/(4*(3.1415**2)*(1-vlambda**2)**(1.5))
-#         if f>fc/2:
-#             d2= 0
-#         else:
-#            d2= ((8*(co**2)*(1-2*(vlambda)**2)))/(fc**2*(3.1415)**4*l1*l2*vlambda*(1-vlambda**2)**(1/2))
-        
-
-      
-
-# def tau(cl, t, fc, l1, l2):
-#     '''
-#     tau= factor de transmisión
-     
-#     Entradas: 
-    
-#     #cl = velocidad de propagación de la onda en el material [m/s]
-#     #t = espesor del material [m]
-#     #fc = frecuencia crítica [Hz]
-#     #l1 = longitud del material 
-#     #l2 = longitud del material
-#     '''
-
-    #ms= masa superficial
-    #fc frecuencia crítica
-    #nt= factor de pérdida total
-    #sigma= factor de radiación para ondas de flexión libres
-    #sigma_f = factor de radiación para 
-    #l1, l2 = longitudes de los bordes rectangulares 
-    #ko= número de onda
-    #ro= densidad del aire
-    #co= velocidad de propagación en el aire
-    
-    # f= [20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000]
-     
-    # for i in f:
-    #     ko = ko(f[i])
-    #     if i >= fc:
-    #         sigma = (1/np.sqrt(1-(fc/f)))
-    #         tau= ((2*ro*co)/(2*np.pi*f*ms))**2*((np.pi*fc*(sigma**2))/(2*f*nt))
-    #     else:
-    #         sigma = 1
-    #         tau= ((2*ro*co)/(2*np.pi*f*ms))**2*(2*sigma_f+((l1 + l2)**2)/(l1**2 + l2 **2 ))*(np.sqrt(fc/f))*((sigma**2)/nt)  
-    # return tau
-
-
-# =============================================================================
-# NEW CODE
-# =============================================================================
-
 def iso_model(E, t, tau, c0, lx, ly, densidad, ninterno, f):
     pass
 
@@ -117,7 +30,8 @@ def parametro(tipo_de_material):
 
 densidad, young, ninterno, poisson = parametro(tipo_de_material)  
 
-c0 = 340                        #Velocidad de propagación en el aire [m/s]
+c0 = 343                        #Velocidad de propagación en el aire [m/s]
+rho0 = 1.18                   #Densidad del aire [kg/m3].
 espesor = 0.1                   #Espesor del material.
 l1 = 4                          #Ancho del material
 l2 = 3                          #Largo del material
@@ -141,38 +55,79 @@ elif(tipo_banda=='tercio'):
 #----------------------------CALCULOS/PARAMETROS-----------------------------#
 
 cl = np.sqrt(young/densidad)    #Velocidad de propagación en el material [m/s]
-fc= (c0**2)/(1.8*cl*espesor)    #Frecuencia critica
-ko= 2*np.pi*freqs/c0            #Numero de onda
 
-sigma = 1
-sigma_f = 1
+
+# Array de frecuencia critica
+fp = cl/(5.5*espesor)           #Frecuencia de placa
+fc = np.ones_like(freqs)*((c0**2)/(1.8*cl*espesor))   #Frecuencia critica
+fc[(freqs>fc)&(freqs<fp)] = (
+    fc[(freqs>fc)&(freqs<fp)]*(((4.05*espesor*freqs[(freqs>fc)&(freqs<fp)])/cl)+
+        np.sqrt(1+(4.05*espesor*freqs[(freqs>fc)&(freqs<fp)]/cl))))
+fc[(freqs>fc)&(freqs>=fp)] = 2*fc[(freqs>fc)&(freqs>=fp)]*((freqs[(freqs>fc)&(freqs>=fp)]/fc[(freqs>fc)&(freqs>=fp)])**3)
+k0 = 2*np.pi*freqs/c0           #Numero de onda
+vlambda = np.sqrt(freqs/fc)     #Lambda
+
+delta1 = (((1-(vlambda**2))*np.log((1+vlambda)/(1-vlambda))+2*vlambda)/
+          (4*(np.pi**2)*((1-(vlambda**2))**1.5)))
+delta2 = np.hstack(
+        ((8*(c0**2)*(1-2*(vlambda[freqs<fc/2]**2)))/
+         ((fc[freqs<fc/2]**2)*(np.pi**4)*l1*l2*vlambda[freqs<fc[freqs<fc/2]/2]*np.sqrt(1-vlambda[freqs<fc/2]**2)),
+         np.zeros_like(freqs[freqs>=fc[freqs<fc/2]/2])))
+         
+
+# Cálculo del factor SIGMA de radiación para ondas libres 
+
+sigma1 = 1/np.sqrt(1-(fc/freqs))
+sigma2 = 4*l1*l2*((freqs/c0)**2)
+sigma3 = (2*np.pi*freqs*(l1+l2))/np.sqrt(16*c0)
+f11 = ((c0**2)/(4*fc))*(l1**-2+l2**-2)      #Frecuencia 1er modo axial
+
+if f11<=fc/2:
+    sigma = ((2*(l1+l2)*c0*delta1[freqs<fc])/(l1*l2*fc))+delta2[freqs<fc]
+    sigma2 = sigma2[freqs<fc]
+    sigma[(freqs[freqs<fc]<f11) & (sigma>sigma2)] = sigma2[(freqs[freqs<fc]<f11) & (sigma>sigma2)]
+    sigma1 = sigma1[freqs>=fc]
+    sigma = np.hstack((sigma,sigma1))
+    
+elif f11>fc/2:
+    if sigma2<sigma3 and sigma1<sigma3:
+        sigma = np.hstack((sigma2[freqs<fc],sigma1[freqs>fc]))
+    elif sigma2<sigma3 and sigma1>=sigma3:
+        sigma = np.hstack((sigma2[freqs<fc],sigma3[freqs>fc]))
+    elif sigma2>=sigma3 and sigma1<sigma3:
+        sigma = np.hstack((sigma3[freqs<fc],sigma1[freqs>fc]))
+    else:
+        sigma = sigma3
+
 masa_s = densidad*espesor
-n_tot = ninterno + (masa_s/(485*np.sqrt(freqs)))
+# n_tot = ninterno + (2*rho0*c0*sigma)/(2*np.pi*freqs*masa_s) + (c0/((np.pi**2))
+n_tot = ninterno + masa_s/(485*np.sqrt(freqs))
+pico = -0.9564-(0.5+(l2/(l1*np.pi)))*np.log(l2/l1)+5*l2/(2*np.pi*l1)-1/(4*np.pi*l1*l2*(k0**2))
+sigma_f = 0.5*(np.log(k0*np.sqrt(l1*l2))- pico)
 
-pico = -0.9564- (0.5+ (l2/(l1*np.pi)))*np.log(l2/l1) + (5*l2/ 2*np.pi*l1)- (1/ 4*np.pi*l1*l2*(ko**2))
-sigma_f = 0.5* (np.log(ko*np.sqrt(l1*l2))- pico)
-sigma = (1/np.sqrt(1-(fc/freqs)))
 
-
-# 1st condition f <= fc
-f1 = freqs[freqs<=fc]
-n1_tot = n_tot[freqs<=fc]
-sigma1 = 1
-a = (2*densidad*c0)/(2*np.pi*f1*masa_s)
-b = (np.pi*fc*(sigma1**2))/(2*f1*n1_tot)
+# 1st condition f < fc
+f1 = freqs[freqs<fc]
+n1_tot = n_tot[freqs<fc]
+sigma1_f = sigma_f[freqs<fc] 
+a = (2*rho0*c0)/(2*np.pi*f1*masa_s)
+b = 2*sigma1_f+(((l1+l2)**2)/(l1**2+l2**2))*np.sqrt(fc/f1)*((sigma[freqs<fc]**2)/n1_tot)
 tau1 = (a**2)*b
 
-
-# 2nd condition f <= fc
-f2 = freqs[freqs>fc]
-n2_tot = n_tot[freqs>fc]
-sigma2_f = sigma_f[freqs>fc] 
-sigma2 = sigma[freqs>fc]
-a = (2*densidad*c0)/(2*np.pi*f2*masa_s)
-b = 2*sigma2_f+(((l1+l2)**2)/(l1**2+l2**2))*np.sqrt(fc/f2)*((sigma2**2)/n2_tot)
+# 2nd condition f >= fc
+f2 = freqs[freqs>=fc]
+n2_tot = n_tot[freqs>=fc]
+a = (2*rho0*c0)/(2*np.pi*f2*masa_s)
+b = (np.pi*fc*(sigma[freqs>=fc]**2))/(2*f2*n2_tot)
 tau2 = (a**2)*b
 
 tau = np.hstack((tau1,tau2))
-R = -10*np.log(tau)
-
+R = -10*np.log10(tau)
+R = np.round(R,2)
+plt.figure()
+plt.semilogx(freqs,R)
+plt.ylim(0,100)
+plt.xlim(0,22000)
+# plt.xticks(freqs, freqs, rotation=70)
+plt.grid()
 
