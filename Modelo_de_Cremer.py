@@ -1,35 +1,30 @@
-# -*- coding: utf-8 -*-
+# -*- c0ding: utf-8 -*-
 """
 Created on Sun Nov  1 17:37:48 2020
 
-@author: Franco
+@author: Franc0
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-
-
 # =============================================================================
 # Se lee los datos del excel
 # =============================================================================
 
-materiales = pd.read_excel('tabla_de_materiales.xlsx',
-                         skiprows=1, usecols = [1,2,3,4,5,6] )
-
+materiales = pd.read_excel('tabla_materiales.xlsx')
 tipo_de_material = input('Ingrese el tipo de material: ')
-
 
 # =============================================================================
 # Tercio de octava o octava
 # =============================================================================
 
 bandas = {'octava' : [31.5,63,125,250,500,1000,2000,4000,8000,16000],
-                      'tercio de octava' : [20,25,31.5,40,50,63,80,100,125,160,
-                                            200,250,315,400,500,630,800,1000,
-                                            1250,1600,2000,2500,3150,4000,5000,
-                                            6300,8000,10000,12500,16000,20000]}
+                      'tercio' : [20,25,31.5,40,50,63,80,100,125,160,
+                                  200,250,315,400,500,630,800,1000,
+                                  1250,1600,2000,2500,3150,4000,5000,
+                                  6300,8000,10000,12500,16000,20000]}
 
 tipos_de_frecuencia = input('Ingrese si la frecuencia estara en tercio de octava o octavas: ')
 
@@ -38,8 +33,8 @@ def octava_terciodeoctava(tipos_de_frecuencia):
     
     if(tipos_de_frecuencia=='octava'):
         f = bandas['octava']
-    elif(tipos_de_frecuencia=='tercio de octava'):
-        f = bandas['tercio de octava']
+    elif(tipos_de_frecuencia=='tercio'):
+        f = bandas['tercio']
     else:
         print('Error')
     
@@ -58,8 +53,6 @@ def parametro(tipo_de_material):
         
         if a[i]==True:
     
-            fila = i
-    
             datos = materiales.iloc[i]
     
             densidad  = datos.loc['Densidad']
@@ -74,32 +67,26 @@ densidad, E, ninterno, tau = parametro(tipo_de_material)
       
 
 
-def modelo_de_cremer(E, t, tau, co, lx, ly, densidad, ninterno, f):
-
-
+def modelo_de_cremer(E, t, tau, c0, lx, ly, densidad, ninterno, f):
     """
     E = Módulo de Young
     t = Espesor
     tau = Módulo de Poisson
-    co = Velocidad del sonido
+    c0 = Velocidad del sonido
     lx = Ancho del material
     ly = Largo del material
     ninterno = Factor de pérdidas
-    f = Las frecuencias que componen una octava o un tercio de octava
+    f = Las frecuencias que c0mponen una octava o un tercio de octava
     """                        
 # =============================================================================
 # Calculos necesarios
 # =============================================================================
    
     ms = densidad * t
-    
     B = (E*(t**3))/(12*(1-(tau**2)))
-    
-    fc = ((co**2)/(2*np.pi))*(np.sqrt(ms/B))
-    
+    fc = ((c0**2)/(2*np.pi))*(np.sqrt(ms/B))
     fd = (E/(2*np.pi*densidad)) * (np.sqrt(ms/B))
-    
-    f11 = ((co**2)/4*fc)*((1/(lx**2))+(1/(ly**2)))
+    f11 = ((c0**2)/4*fc)*((1/(lx**2))+(1/(ly**2)))
 
 # =============================================================================
 #     Aca empieza el metodo   
@@ -126,7 +113,7 @@ def modelo_de_cremer(E, t, tau, co, lx, ly, densidad, ninterno, f):
     return R, f
     
     
-R,f = modelo_de_cremer(E,0.1, tau, 343, 4, 3, densidad, ninterno, f)   
-        
+R,f = modelo_de_cremer(E,0.1, tau, 343, 4, 3, densidad, ninterno, f)
+R = np.round(R,2)
 plt.figure()
 plt.semilogx(f,R)
