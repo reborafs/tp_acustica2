@@ -16,8 +16,7 @@ from scipy.interpolate import interp1d
 # Se lee los datos del excel
 # =============================================================================
 
-materiales = pd.read_excel(r'C:/Users/ACER/Documents/Codigos/Python/Tabla_de_materiales.xlsx',
-                         skiprows=1, usecols = [1,2,3,4,5,6] )
+materiales = pd.read_excel('tabla_materiales.xlsx')
 
 tipo_de_material = input('Ingrese el tipo de material: ')
 
@@ -27,10 +26,10 @@ tipo_de_material = input('Ingrese el tipo de material: ')
 # =============================================================================
 
 bandas = {'octava' : [31.5,63,125,250,500,1000,2000,4000,8000,16000],
-                      'tercio de octava' : [20,25,31.5,40,50,63,80,100,125,160,
-                                            200,250,315,400,500,630,800,1000,
-                                            1250,1600,2000,2500,3150,4000,5000,
-                                            6300,8000,10000,12500,16000,20000]}
+          'tercio' : [20,25,31.5,40,50,63,80,100,125,160,
+                      200,250,315,400,500,630,800,1000,
+                      1250,1600,2000,2500,3150,4000,5000,
+                      6300,8000,10000,12500,16000,20000]}
 
 tipos_de_frecuencia = input('Ingrese si la frecuencia estara en tercio de octava o octavas: ')
 
@@ -39,8 +38,8 @@ def octava_terciodeoctava(tipos_de_frecuencia):
     
     if(tipos_de_frecuencia=='octava'):
         f = bandas['octava']
-    elif(tipos_de_frecuencia=='tercio de octava'):
-        f = bandas['tercio de octava']
+    elif(tipos_de_frecuencia=='tercio'):
+        f = bandas['tercio']
     else:
         print('Error')
     
@@ -58,9 +57,7 @@ def parametro(tipo_de_material):
     for i in range(len(a)):
         
         if a[i]==True:
-    
-            fila = i
-    
+      
             datos = materiales.iloc[i]
     
             densidad  = datos.loc['Densidad']
