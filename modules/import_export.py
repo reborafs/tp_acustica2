@@ -3,7 +3,6 @@ import pandas as pd
 
 #-----------------------------------IMPORT-----------------------------------#
 
-
 def import_material(material_name):
     '''
     Input a string with the desired material and returns a dict with its 

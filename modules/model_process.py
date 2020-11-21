@@ -2,11 +2,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-
-
 # =============================================================================
 # Tercio de octava o octava
 # =============================================================================
@@ -65,10 +60,8 @@ def parametro(tipo_de_material):
 
     return density,E,ninterno,tau
 
-      
 
-
-def cremer_model(freqs, young, thickness, poisson, lx, ly, density, ninterno, c0 = 343):
+def cremer_model(freqs, lx, ly, thickness, young, poisson, density, ninterno, c0 = 343):
     """
 
     """                        
@@ -98,7 +91,7 @@ def cremer_model(freqs, young, thickness, poisson, lx, ly, density, ninterno, c0
             
     return R
     
-def sharp_model(freqs, young, thickness, poisson, lx, ly, density, ninterno, rho_aire = 1.18, c0 = 343):
+def sharp_model(freqs, lx, ly, thickness, young, poisson, density, ninterno, rho_aire = 1.18, c0 = 343):
     """
 
     """                        
@@ -131,7 +124,7 @@ def sharp_model(freqs, young, thickness, poisson, lx, ly, density, ninterno, rho
     return R
 
 
-def iso_model(freqs, young, thickness, poisson, lx, ly, density, ninterno, c0 = 343, rho0 = 1.18):
+def iso_model(freqs, lx, ly, thickness, young, poisson, density, ninterno, c0 = 343, rho0 = 1.18):
 
     if lx>ly:
         l1 = lx
@@ -209,7 +202,7 @@ def iso_model(freqs, young, thickness, poisson, lx, ly, density, ninterno, c0 = 
     return R
 
 
-def davy_model(freqs, young, thickness, poisson, lx, ly, density, lossfactor, c0 = 343, rho0 = 1.18):
+def davy_model(freqs, lx, ly, thickness, young, poisson, density, lossfactor, c0 = 343, rho0 = 1.18):
 
     ms = density * thickness                          #Masa superficial
     B = (young*(thickness**3))/(12*(1-(poisson**2)))  #B
@@ -298,37 +291,37 @@ def shear(freqs, density, young, poisson, thickness):
 #  TESTING MODELS
 # =============================================================================
 
-material = 'Ladrillo'
-thickness = 0.1
-lx = 4
-ly = 3
+# material = 'Ladrillo'
+# thickness = 0.1
+# lx = 4
+# ly = 3
 
-freqs = octave_thirdoctave('third')    
-density, young, ninterno, poisson = parametro(material)
+# freqs = octave_thirdoctave('third')    
+# density, young, ninterno, poisson = parametro(material)
 
-R_cremer = cremer_model(freqs, young, thickness, poisson, lx, ly, density, ninterno)
-R_cremer = np.round(R_cremer,2)
+# R_cremer = cremer_model(freqs, lx, ly, thickness, young, poisson, density, ninterno)
+# R_cremer = np.round(R_cremer,2)
 
-R_sharp = sharp_model(freqs, young, thickness, poisson, lx, ly, density, ninterno)
-R_sharp = np.round(R_sharp,2)
+# R_sharp = sharp_model(freqs, lx, ly, thickness, young, poisson, density, ninterno)
+# R_sharp = np.round(R_sharp,2)
 
-R_iso = iso_model(freqs, young, thickness, poisson, lx, ly, density, ninterno)
-R_iso = np.round(R_iso,2)
+# R_iso = iso_model(freqs, lx, ly, thickness, young, poisson, density, ninterno)
+# R_iso = np.round(R_iso,2)
 
-R_davy = davy_model(freqs, young, thickness, poisson, lx, ly, density, ninterno)
-R_davy = np.round(R_davy, 2)
+# R_davy = davy_model(freqs, lx, ly, thickness, young, poisson, density, ninterno)
+# R_davy = np.round(R_davy, 2)
 
 
-# Plotting
-plt.figure()
-plt.title('Single leaf wall insulation')
-plt.semilogx(freqs, R_cremer)
-plt.semilogx(freqs, R_sharp)
-plt.semilogx(freqs, R_iso)
-plt.semilogx(freqs, R_davy)
-plt.xlabel('Frequency [Hz]')
-plt.ylabel('R [dB]')
-plt.xticks((20,100,1000,10000,20000),(20,100,'1k','10k','20k'))
-plt.grid(which='both')
+# # Plotting
+# plt.figure()
+# plt.title('Single leaf wall insulation')
+# plt.semilogx(freqs, R_cremer)
+# plt.semilogx(freqs, R_sharp)
+# plt.semilogx(freqs, R_iso)
+# plt.semilogx(freqs, R_davy)
+# plt.xlabel('Frequency [Hz]')
+# plt.ylabel('R [dB]')
+# plt.xticks((20,100,1000,10000,20000),(20,100,'1k','10k','20k'))
+# plt.grid(which='both')
 
-plt.legend(('Cremer', 'Sharp', 'ISO 12354-1', 'Davy'))
+# plt.legend(('Cremer', 'Sharp', 'ISO 12354-1', 'Davy'))
