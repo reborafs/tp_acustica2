@@ -60,6 +60,11 @@ def parametro(tipo_de_material):
 
     return density,E,ninterno,tau
 
+def freq_c(lx, ly, thickness, young, poisson, density, c0=343):
+    ms = density * thickness
+    B = (young*(thickness**3))/(12*(1-(poisson**2)))
+    fc = ((c0**2)/(2*np.pi))*(np.sqrt(ms/B))
+    return fc
 
 def cremer_model(freqs, lx, ly, thickness, young, poisson, density, ninterno, c0 = 343):
     """

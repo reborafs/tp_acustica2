@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from import_export import import_material
+from import_export import import_material, export_to_excel
 from Material_class import Material
 from model_process import octave_thirdoctave
 
@@ -16,9 +16,12 @@ band_type = 'third'
 freqs = octave_thirdoctave(band_type)
 
 R_cremer = material.cremer(lx,ly,thickness, band_type)
-R_sharp = material.davy(lx,ly,thickness)
+R_sharp = material.sharp(lx,ly,thickness)
 R_iso = material.iso12354(lx,ly,thickness)
 R_davy = material.davy(lx,ly,thickness)
+
+# Export to excel
+export_to_excel(lx,ly,thickness, band_type, material)
 
 # PLOTTING
 plt.figure()
