@@ -1,13 +1,10 @@
 import pandas as pd
 import numpy as np
-from modules.import_export import import_material, export_to_excel
-from Material_class import Material
-from model_process import octave_thirdoctave
-from gui import Ui_MainWindow
+from process import import_material, export_to_excel, Material, octave_thirdoctave
+from gui import Ui_MainWindow, TableModel
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtCore import QRegExp
-from tablemodel import TableModel
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, *args, **kwargs):
@@ -19,7 +16,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         material_list = df['Material'].tolist()        
         for material in material_list:
             self.cb_material.addItem(material)
-        thick_condition = QRegExp("\\d\\.\\d{1,2}")
+        thick_condition = QRegExp("\\d\\.\\d{1,4}")
         l_condition = QRegExp("\\d{1,2}\\.\\d{1,2}")
         self.input_thick.setValidator(QRegExpValidator(thick_condition))
         self.input_lx.setValidator(QRegExpValidator(l_condition))

@@ -394,7 +394,7 @@
        </palette>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="plot_tab">
        <attribute name="title">
@@ -475,7 +475,7 @@
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>450</width>
+            <width>400</width>
             <height>20</height>
            </size>
           </property>

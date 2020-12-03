@@ -1,12 +1,71 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainwindow.ui'
-#
-# Created by: PyQt5 UI code generator 5.9.2
-#
-# WARNING! All changes made in this file will be lost!
-
+import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
+from matplotlib.backends.backend_qt5agg import FigureCanvas, NavigationToolbar2QT
+from matplotlib.figure import Figure
+from matplotlib.ticker import EngFormatter
+
+class TableModel(QtCore.QAbstractTableModel):
+
+    def __init__(self, data):
+        super(TableModel, self).__init__()
+        self._data = data
+
+    def data(self, index, role):
+        if role == QtCore.Qt.DisplayRole:
+            value = self._data.iloc[index.row(), index.column()]
+            return str(value)
+
+    def rowCount(self, index):
+        return self._data.shape[0]
+
+    def columnCount(self, index):
+        return self._data.shape[1]
+
+    def headerData(self, section, orientation, role):
+        # section is the index of the column/row.
+        if role == QtCore.Qt.DisplayRole:
+            if orientation == QtCore.Qt.Horizontal:
+                return str(self._data.columns[section])
+
+            if orientation == QtCore.Qt.Vertical:
+                return str(self._data.index[section])
+
+class MplWidget(QtWidgets.QWidget):
+    
+    def __init__(self, parent = None):
+
+        QtWidgets.QWidget.__init__(self, parent)
+        
+        self.canvas = FigureCanvas(Figure(tight_layout=True))
+        self.mpl_toolbar = NavigationToolbar2QT(self.canvas, parent)
+
+        vertical_layout = QtWidgets.QVBoxLayout()
+        vertical_layout.addWidget(self.canvas)
+        vertical_layout.addWidget(self.mpl_toolbar)
+
+        self.setLayout(vertical_layout)
+        
+        
+        self.canvas.axes = self.canvas.figure.add_subplot(111)
+        self.setup_axes()
+        # self.canvas.axes.xaxis.set_ticks([20,100,1000,10000,20000])
+        
+    def setup_axes(self):
+        self.canvas.axes.set_title('Aislamiento de ruido aéreo de un panel simple')
+        self.canvas.axes.set_xscale('log')
+        self.canvas.axes.grid(which='both')
+        formatter0 = EngFormatter(unit='Hz',sep="\N{THIN SPACE}")
+        formatter1 = EngFormatter(unit='dB',sep="\N{THIN SPACE}")
+        self.canvas.axes.xaxis.set_major_formatter(formatter0)        
+        self.canvas.axes.yaxis.set_major_formatter(formatter1)        
+        self.canvas.axes.set_xlabel('Frecuencias')
+        self.canvas.axes.set_ylabel('Aislamiento')
+        self.canvas.axes.set_ylim(0,100)
+        self.canvas.axes.set_xlim(20,20000)
+        self.canvas.axes.set_xticks(np.array([31.5,63,125,250,500,
+                                              1000,2000,4000,8000,16000]))
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -206,7 +265,7 @@ class Ui_MainWindow(object):
         self.show_fd.setReadOnly(True)
         self.show_fd.setObjectName("show_fd")
         self.gridLayout_2.addWidget(self.show_fd, 2, 1, 1, 1)
-        spacerItem1 = QtWidgets.QSpacerItem(450, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem1 = QtWidgets.QSpacerItem(400, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout_2.addItem(spacerItem1, 1, 3, 1, 1)
         self.output_tabs.addTab(self.table_tab, "")
         self.gridLayout_3.addWidget(self.output_tabs, 1, 0, 1, 1)
@@ -222,8 +281,8 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "TP1 - Acustica 2"))
-        self.label_title.setText(_translate("MainWindow", "Datos de Entrada"))
-        self.label_title_2.setText(_translate("MainWindow", "Metodos de Calculo"))
+        self.label_title.setText(_translate("MainWindow", "DATOS DE ENTRADA"))
+        self.label_title_2.setText(_translate("MainWindow", "MÉTODOS DE CÁLCULO"))
         self.checkbox_cremer.setText(_translate("MainWindow", "Cremer"))
         self.checkbox_sharp.setText(_translate("MainWindow", "Sharp"))
         self.checkbox_iso.setText(_translate("MainWindow", "ISO 12354-1"))
@@ -248,14 +307,12 @@ class Ui_MainWindow(object):
         self.label_unit_4.setText(_translate("MainWindow", "Hz"))
         self.output_tabs.setTabText(self.output_tabs.indexOf(self.table_tab), _translate("MainWindow", "Tablas"))
 
-from mplwidget import MplWidget
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+# if __name__ == "__main__":
+#     app = QtWidgets.QApplication(sys.argv)
+#     MainWindow = QtWidgets.QMainWindow()
+#     ui = Ui_MainWindow()
+#     ui.setupUi(MainWindow)
+#     MainWindow.show()
+#     sys.exit(app.exec_())
 

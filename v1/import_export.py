@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from model_process import octave_thirdoctave, freq_c
+from modules.model_process import octave_thirdoctave, freq_c
 
 #-----------------------------------IMPORT-----------------------------------#
 
@@ -30,8 +30,7 @@ def import_material(material_name):
 
 #-----------------------------------EXPORT-----------------------------------#
 
-def export_to_excel(filename, lx, ly, thickness, band_type, Material,
-                    cremer=True,sharp=True,iso=True,davy=True):
+def export_to_excel(filename, lx, ly, thickness, band_type, Material):
      
     freqs = octave_thirdoctave(band_type)
     fc = freq_c(lx, ly, thickness, Material.young, Material.poisson, Material.density)
@@ -52,24 +51,8 @@ def export_to_excel(filename, lx, ly, thickness, band_type, Material,
             'Modelo de Davy': np.round(Material.davy(lx,ly,thickness),2)}) 
     
     
-    df_output = df_output.transpose()
-    
-    n = 0
-    if cremer == False:
-        n += 1
-        df_output = df_output.drop(index='Modelo de Cremer')
-    if sharp == False:
-        n += 1
-        df_output = df_output.drop(index='Modelo de Sharp')
-    if iso == False:
-        n += 1
-        df_output = df_output.drop(index='ISO 12354-1')
-    if davy == False:
-        n += 1
-        df_output = df_output.drop(index='Modelo de Davy')
-        
+    df_output = df_output.transpose()       
 
-    
     writer = pd.ExcelWriter(filename, engine='xlsxwriter')
     
     df_input.to_excel(writer, sheet_name='Export', startrow=1, startcol=1, index=False)
@@ -85,30 +68,26 @@ def export_to_excel(filename, lx, ly, thickness, band_type, Material,
     ### Plotting the 4 arrays
     chart = workbook.add_chart({'type': 'line'})
     
-    if n!=0:
-        n-=1
-        chart.add_series({
-            'name':         '=Export!$A$6',
-            'categories':   '=Export!$B$5:$AF$5',
-            'values':       '=Export!$B$6:$AF$6'})
-    if n!=0:
-        n-=1
-        chart.add_series({
-            'name':         '=Export!$A$7',
-            'categories':   '=Export!$B$5:$AF$5',
-            'values':       '=Export!$B$7:$AF$7'})
-    if n!=0:
-        n-=1    
-        chart.add_series({
-            'name':         '=Export!$A$8',
-            'categories':   '=Export!$B$5:$AF$5',
-            'values':       '=Export!$B$8:$AF$8'})
-    if n!=0:
-        n-=1
-        chart.add_series({
-            'name':         '=Export!$A$9',
-            'categories':   '=Export!$B$5:$AF$5',
-            'values':       '=Export!$B$9:$AF$9'})
+
+    chart.add_series({
+        'name':         '=Export!$A$6',
+        'categories':   '=Export!$B$5:$AF$5',
+        'values':       '=Export!$B$6:$AF$6'})
+
+    chart.add_series({
+        'name':         '=Export!$A$7',
+        'categories':   '=Export!$B$5:$AF$5',
+        'values':       '=Export!$B$7:$AF$7'})
+
+    chart.add_series({
+        'name':         '=Export!$A$8',
+        'categories':   '=Export!$B$5:$AF$5',
+        'values':       '=Export!$B$8:$AF$8'})
+
+    chart.add_series({
+        'name':         '=Export!$A$9',
+        'categories':   '=Export!$B$5:$AF$5',
+        'values':       '=Export!$B$9:$AF$9'})
     
     # Configure the chart axes.
     chart.set_x_axis({'name': 'Frequency [Hz]', 'position_axis': 'on_tick'})
